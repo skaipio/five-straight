@@ -1,0 +1,9 @@
+.SizeSelector select {
+  width: 6em;
+}
+
+.SizeSelector span {
+  color: #f19f4d;
+  font-size: x-large;
+  padding-right: 1em;
+}
