@@ -121,11 +121,11 @@ class Arena extends Component {
         <div className="WinnerDisplay">
           {this.state.playerHasWon ? <Winner winner={this.state.player}/> : null}
         </div>
-        <HighlightCounter label="Turn: " count={this.state.turn} />
+        <HighlightCounter label="Turn " count={this.state.turn} />
         <div className="Flex">
-          <HighlightCounter label="Player 1: " count={this.state.playerOneWins} />
+          <HighlightCounter label="Player 1" count={this.state.playerOneWins} vertical={true} />
           {this.state.board}
-          <HighlightCounter label="Player 2: " count={this.state.playerTwoWins} />
+          <HighlightCounter label="Player 2" count={this.state.playerTwoWins} vertical={true} />
         </div>
         <button className="Reset button" onClick={this.resetGame.bind(this)}>Reset</button>
       </div>
