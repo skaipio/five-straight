@@ -1,8 +1,11 @@
 var _ = require('lodash');
 
+// Required amount of pieces in a straight
 const REQUIRED_LENGTH = 5;
 
 function Game(size) {
+  // We could make a 2D board but iterating over all the cells
+  // is easier when they're all consecutively in a single table
   this.board = _.map(_.range(size*size), () => 0);
   this.boardSize = size;
   this.turn = 0;
@@ -32,7 +35,7 @@ Game.prototype.move = function (x, y) {
 };
 
 /**
-Checks every direction from the last move to see if there's a straight of five.
+Checks every direction from the last move to see if there's a straight of REQUIRED_LENGTH.
 Returns true if there is, otherwise false.
 **/
 Game.prototype.evaluate = function(lastMove, player) {
