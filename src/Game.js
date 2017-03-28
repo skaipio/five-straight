@@ -85,7 +85,7 @@ function hasStraightHelper(board, boardSize, player, required, currentPoint, inc
     } else {
       var nextX = currentPoint.x + increment.x;
       var nextY = currentPoint.y + increment.y;
-      if (nextX < boardSize && nextY < boardSize) {
+      if (_.inRange(nextX, boardSize) && _.inRange(nextY, boardSize)) {
         var nextPoint = {
           x: nextX,
           y: nextY
