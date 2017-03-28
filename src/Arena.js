@@ -9,16 +9,20 @@ function Winner(props) {
   return <h2>Player {props.winner} has won!</h2>;
 }
 
+function getFreshState(game) {
+  return {
+    game: game,
+    turn: game.turn,
+    playerOneWins: 0,
+    playerTwoWins: 0
+  }
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
     const game = new Game(5);
-    this.state = {
-      game: game,
-      turn: game.turn,
-      playerOneWins: 0,
-      playerTwoWins: 0
-    }
+    this.state = getFreshState(game);
     this.onTurnChange = this.onTurnChange.bind(this);
     this.resetGame = this.resetGame.bind(this);
     this.handleSizeChange = this.handleSizeChange.bind(this);
@@ -31,14 +35,9 @@ class App extends Component {
   handleSizeChange(e) {
     const val = parseInt(e.target.value);
     const game = new Game(val);
-    this.setState({
-      game: game,
-      turn: game.turn,
-      playerHasWon: false,
-      playerOneWins: 0,
-      playerTwoWins: 0,
-      board: this.createNewBoard(game.boardSize)
-    });
+    const state = getFreshState(game);
+    state.board = this.createNewBoard(game.boardSize);
+    this.setState(state);
   }
 
   onTurnChange(x, y) {
