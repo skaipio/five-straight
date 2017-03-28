@@ -13,13 +13,9 @@ class Board extends Component {
 
   createCell(e, i, boardSize) {
     const tableKey = 'col-' + i;
-    const x = i % boardSize;
-    const y = Math.floor(i / boardSize);
     const gameBoard = this;
     return <BoardCell key={tableKey}
-      onClick={() => {
-        return gameBoard.props.onCellClick(x, y);
-      }} />;
+      onClick={() => gameBoard.props.onCellClick(i)} />;
   }
 
   createBoard(boardSize) {

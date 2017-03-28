@@ -40,9 +40,9 @@ class App extends Component {
     this.setState(state);
   }
 
-  onTurnChange(x, y) {
+  onTurnChange(index) {
     if (!this.state.playerHasWon) {
-      const result = this.state.game.move(x, y);
+      const result = this.state.game.move(index);
       const newState = {
         playerHasWon: result.playerWon,
         player: result.player,

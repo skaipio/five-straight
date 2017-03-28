@@ -16,10 +16,9 @@ Records the move, evaluates current situation (win or loss)
 and returns the result with the player that made the move
 and the evaluation.
 **/
-Game.prototype.move = function (x, y) {
+Game.prototype.move = function (index) {
   var player = this.turn % 2 === 0 ? 1 : 2;
   const result = {};
-  const index = indexAt(this.boardSize, x, y);
   if (this.board[index] !== 0) {
     // Stop here if cell is already occupied
     player = 0;
