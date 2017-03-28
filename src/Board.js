@@ -14,7 +14,9 @@ class Board extends Component {
   createCell(e, i, boardSize) {
     const tableKey = 'col-' + i;
     const gameBoard = this;
+    const registerTriggerClick = this.props.registerTriggerClick;
     return <BoardCell key={tableKey}
+      registerTriggerClick={(cb) => registerTriggerClick(cb, i)}
       onClick={() => gameBoard.props.onCellClick(i)} />;
   }
 

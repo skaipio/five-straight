@@ -1,4 +1,5 @@
-var _ = require('lodash');
+import _ from 'lodash';
+import Ai from './Ai';
 
 // Required amount of pieces in a straight
 const REQUIRED_LENGTH = 5;
@@ -9,6 +10,7 @@ function Game(size) {
   this.board = _.map(_.range(size*size), () => 0);
   this.boardSize = size;
   this.turn = 0;
+  this.ai = new Ai('random', this.board);
 }
 
 /**
@@ -17,6 +19,7 @@ and returns the result with the player that made the move
 and the evaluation.
 **/
 Game.prototype.move = function (index) {
+  this.lastMove = index;
   var player = this.turn % 2 === 0 ? 1 : 2;
   const result = {};
   if (this.board[index] !== 0) {
@@ -53,7 +56,12 @@ Game.prototype.evaluate = function(lastMove, player) {
 Game.prototype.reset = function () {
   this.board = _.map(_.range(this.boardSize*this.boardSize), () => 0);
   this.turn = 0;
+  this.ai = new Ai('random', this.board);
 };
+
+Game.prototype.getAiMove = function() {
+  return this.ai.getNextMove(this.lastMove);
+}
 
 function getPoint(size, index) {
   return {

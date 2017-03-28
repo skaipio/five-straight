@@ -5,6 +5,9 @@ import HighlightCounter from './HighlightCounter';
 import Game from './Game';
 import './Arena.css';
 
+const AI_DELAY = 500; // ms
+const INITIAL_BOARD_SIZE = 5;
+
 function Winner(props) {
   return <h2>Player {props.winner} has won!</h2>;
 }
@@ -18,18 +21,26 @@ function getFreshState(game) {
   }
 }
 
-class App extends Component {
+class Arena extends Component {
   constructor(props) {
     super(props);
-    const game = new Game(5);
-    this.state = getFreshState(game);
+    this.bindMethods.bind(this)();
+    const game = new Game(INITIAL_BOARD_SIZE);
+    const state = getFreshState(game);
+    state.artificialIntelligenceEnabled = true;
+    this.state = state;
+    this.state.board = this.createNewBoard(this.state.game.boardSize);
+    this.playerHasWon = false;
+    this.boardKey = 0;
+    this.clickTriggers = new Array(INITIAL_BOARD_SIZE*INITIAL_BOARD_SIZE);
+  }
+
+  bindMethods() {
+    this.registerTriggerClick = this.registerTriggerClick.bind(this);
     this.onTurnChange = this.onTurnChange.bind(this);
     this.resetGame = this.resetGame.bind(this);
     this.handleSizeChange = this.handleSizeChange.bind(this);
     this.createNewBoard = this.createNewBoard.bind(this);
-    this.state.board = this.createNewBoard(this.state.game.boardSize);
-    this.playerHasWon = false;
-    this.boardKey = 0;
   }
 
   handleSizeChange(e) {
@@ -58,6 +69,15 @@ class App extends Component {
     return 0;
   }
 
+  /**
+   * For being able to trigger a click manually on the BoardCells.
+   * Required for AI to make a move
+   * click is the trigger function of ith board cell
+   */
+  registerTriggerClick(click, i) {
+    this.clickTriggers[i] = click;
+  }
+
   createNewBoard(boardSize) {
     // Increment boardKey so that React
     // understands that we want a new board
@@ -65,17 +85,30 @@ class App extends Component {
       <Board
       key={this.boardKey++}
       initialSize={boardSize}
-      onCellClick={this.onTurnChange}/>
+      onCellClick={this.onTurnChange}
+      registerTriggerClick={this.registerTriggerClick}/>
     );
   }
 
   resetGame() {
     this.state.game.reset();
+    const boardSize = this.state.game.boardSize;
+    this.clickTriggers = new Array(boardSize*boardSize)
     this.setState({
       turn: this.state.game.turn,
       playerHasWon: false,
-      board: this.createNewBoard(this.state.game.boardSize)
+      board: this.createNewBoard(boardSize)
     });
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if (prevState.player != this.state.player &&
+        this.state.artificialIntelligenceEnabled &&
+        this.state.player === 1) {
+      const aiMove = this.state.game.getAiMove();
+      // Add a little timeout to give the AI an inkling of humanity
+      setTimeout(this.clickTriggers[aiMove], AI_DELAY);
+    }
   }
 
   render() {
@@ -100,4 +133,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Arena;

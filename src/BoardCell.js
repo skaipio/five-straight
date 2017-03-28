@@ -8,6 +8,12 @@ class BoardCell extends Component {
     };
   }
 
+  componentDidMount() {
+    this.props.registerTriggerClick(() => {
+      this.handleClick();
+    })
+  }
+
   handleClick() {
     const player = this.props.onClick();
     if (player !== 0){
