@@ -3,6 +3,7 @@ import Ai from './Ai';
 
 // Required amount of pieces in a straight
 const REQUIRED_LENGTH = 5;
+const AI_BEHAVIOR = 'smart';
 
 function Game(size) {
   // We could make a 2D board but iterating over all the cells
@@ -10,7 +11,7 @@ function Game(size) {
   this.board = _.map(_.range(size*size), () => 0);
   this.boardSize = size;
   this.turn = 0;
-  this.ai = new Ai('random', this.board);
+  this.ai = new Ai(AI_BEHAVIOR, this.board, size);
 }
 
 /**
@@ -56,7 +57,7 @@ Game.prototype.evaluate = function(lastMove, player) {
 Game.prototype.reset = function () {
   this.board = _.map(_.range(this.boardSize*this.boardSize), () => 0);
   this.turn = 0;
-  this.ai = new Ai('random', this.board);
+  this.ai = new Ai(AI_BEHAVIOR, this.board, this.boardSize);
 };
 
 Game.prototype.getAiMove = function() {

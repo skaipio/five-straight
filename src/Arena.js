@@ -127,7 +127,7 @@ class Arena extends Component {
           {this.state.board}
           <HighlightCounter label="Player 2" count={this.state.playerTwoWins} vertical={true} />
         </div>
-        <button className="Reset button" onClick={this.resetGame.bind(this)}>Reset</button>
+        <button className="Reset button" onClick={this.resetGame}>Reset</button>
       </div>
     );
   }
