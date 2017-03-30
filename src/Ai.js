@@ -24,7 +24,7 @@ function getSmartMove(lastMove) {
   // Accumulates the score of a single ray
   const rayScoreAccumulator = (acc,boardIndex,i,coll) => {
     const occupant = this.board[boardIndex];
-    const cellScore = occupant === 2 ? 1 : 0;
+    const cellScore = occupant === this.aiPlayerNumber ? 1 : 0;
     acc.ai = (acc.ai || 0) + cellScore;
     return acc;
   };
@@ -33,7 +33,10 @@ function getSmartMove(lastMove) {
   const rayScoreSummer = (rayEvaluations) =>
     _.sum(rayEvaluations.map((rayEvaluation) => rayEvaluation.evaluation.ai));
 
-  const sunrayCaster = BoardUtil.rayCaster(5, rayScoreAccumulator, rayScoreSummer);
+  const sunrayCaster = BoardUtil.rayCaster(
+    this.requiredStraight,
+    rayScoreAccumulator,
+    rayScoreSummer);
 
   const bestMove = _(this.board)
     // map to occupants
@@ -53,9 +56,11 @@ function getSmartMove(lastMove) {
 }
 
 // behavior should be either 'random' or 'smart'
-function Ai(behavior, board, boardSize) {
+function Ai(aiPlayerNumber, behavior, board, boardSize, requiredStraight) {
+  this.aiPlayerNumber = aiPlayerNumber
   this.board = board;
   this.boardSize = boardSize;
+  this.requiredStraight = requiredStraight;
   this.freeMoves = _.range(board.length);
   this.getNextMove = getStrategy.apply(this, [behavior]);
 }
