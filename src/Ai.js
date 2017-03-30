@@ -21,20 +21,26 @@ function getRandomMove(lastMove) {
 
 // lastMove should be the one made previously by the other player
 function getSmartMove(lastMove) {
-  // Accumulates the score of a single ray
-  const rayScoreAccumulator = (acc,boardIndex,i,coll) => {
-    const occupant = this.board[boardIndex];
-    const cellScore = occupant === this.aiPlayerNumber ? 1 : 0;
-    acc.ai = (acc.ai || 0) + cellScore;
-    return acc;
+  const rayScoreAccumulator = (board, index, previousEvaluation) => {
+    previousEvaluation = previousEvaluation || {ai: 0};
+    const occupant = board[index];
+    // If the occupant is ai itself, give 2 points, if 0 i.e. empty, give 1 point, otherwise 0
+    const cellScore = occupant === this.aiPlayerNumber ? 2 : (occupant === 0 ? 1 : 0);
+    previousEvaluation.ai += cellScore;
+    return previousEvaluation;
   };
 
   // sums the scores from each ray
   const rayScoreSummer = (rayEvaluations) =>
     _.sum(rayEvaluations.map((rayEvaluation) => rayEvaluation.evaluation.ai));
 
-  const sunrayCaster = BoardUtil.rayCaster(
+  const sunrayCaster = BoardUtil.blockableRayCaster(
     this.requiredStraight,
+    // block condition, i.e. what is considered a blocking cell on board
+    (board, index) => {
+      let occupant = board[index];
+      return occupant != 0 && occupant != this.aiPlayerNumber
+    },
     rayScoreAccumulator,
     rayScoreSummer);
 
@@ -46,9 +52,9 @@ function getSmartMove(lastMove) {
     }))
     // consider only unoccupied ones, i.e. cells with 0
     .filter((val) => val.occupant === 0)
-    .map((val, index, board) => {
+    .map((val, index) => {
       // get the score of rays casted from val.index
-      const result = sunrayCaster(board, this.boardSize, val.index);
+      const result = sunrayCaster(this.board, this.boardSize, val.index);
       return {index: val.index, score: result};
     }).maxBy('score');
     console.log('AI move', bestMove);
