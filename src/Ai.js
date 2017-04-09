@@ -1,6 +1,11 @@
 import _ from 'lodash';
 import BoardUtil from './BoardUtil';
 
+const getFreeMoves = (board) => board
+  .map((elem, index) => [elem, index])
+  .filter(elemAndIndex => elemAndIndex[0] === 0)
+  .map(elemAndIndex => elemAndIndex[1]);
+
 function getStrategy(behavior) {
   switch(behavior) {
     case 'smart':
@@ -12,15 +17,13 @@ function getStrategy(behavior) {
 }
 
 // lastMove should be the one made previously by the other player
-function getRandomMove(lastMove) {
-  _.pull(this.freeMoves, lastMove);
-  let nextMove = _.sample(this.freeMoves);
-  _.pull(this.freeMoves, nextMove);
-  return nextMove;
+function getRandomMove(board) {
+  const freeMoves = getFreeMoves(board);
+  return _.sample(freeMoves);
 }
 
 // lastMove should be the one made previously by the other player
-function getSmartMove(lastMove) {
+function getSmartMove(board, boardSize) {
   const rayScoreAccumulator = (board, index, previousEvaluation) => {
     previousEvaluation = previousEvaluation || {ai: 0};
     const occupant = board[index];
@@ -38,13 +41,13 @@ function getSmartMove(lastMove) {
     this.requiredStraight,
     // block condition, i.e. what is considered a blocking cell on board
     (board, index) => {
-      let occupant = board[index];
-      return occupant != 0 && occupant != this.aiPlayerNumber
+      const occupant = board[index];
+      return occupant !== 0 && occupant !== this.aiPlayerNumber
     },
     rayScoreAccumulator,
     rayScoreSummer);
 
-  const bestMove = _(this.board)
+  const bestMove = _(board)
     // map to occupants
     .map((val, index) => ({
       occupant: val,
@@ -54,21 +57,20 @@ function getSmartMove(lastMove) {
     .filter((val) => val.occupant === 0)
     .map((val, index) => {
       // get the score of rays casted from val.index
-      const result = sunrayCaster(this.board, this.boardSize, val.index);
+      const result = sunrayCaster(board, boardSize, val.index);
       return {index: val.index, score: result};
     }).maxBy('score');
     console.log('AI move', bestMove);
   return bestMove.index;
 }
 
-// behavior should be either 'random' or 'smart'
-function Ai(aiPlayerNumber, behavior, board, boardSize, requiredStraight) {
-  this.aiPlayerNumber = aiPlayerNumber
-  this.board = board;
-  this.boardSize = boardSize;
-  this.requiredStraight = requiredStraight;
-  this.freeMoves = _.range(board.length);
-  this.getNextMove = getStrategy.apply(this, [behavior]);
+class Ai {
+  // behavior should be either 'random' or 'smart'
+  constructor(aiPlayerNumber, behavior, requiredStraight) {
+    this.aiPlayerNumber = aiPlayerNumber
+    this.requiredStraight = requiredStraight;
+    this.getNextMove = getStrategy.apply(this, [behavior]);
+  }
 }
 
 export default Ai;
