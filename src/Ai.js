@@ -16,14 +16,61 @@ function getStrategy(behavior) {
   }
 }
 
-// lastMove should be the one made previously by the other player
 function getRandomMove(board) {
   const freeMoves = getFreeMoves(board);
   return _.sample(freeMoves);
 }
 
-// lastMove should be the one made previously by the other player
+const getFreeCells = (board) => {
+  // map to occupants
+  return _(board).map((val, index) => ({
+    occupant: val,
+    index: index
+  }))
+  // consider only unoccupied ones, i.e. cells with 0
+  .filter((val) => val.occupant === 0)
+  .map(({occupant, index}) => index);
+}
+
+function* getDirections() {
+  for (var x = -1; x <= 1; x++) {
+    for (var y = -1; y <= 1; y++) {
+      if (x === 0 && y === 0) continue;
+      yield {x: x, y: y};
+    }
+  }
+}
+
+const getLineScore = (lineGenerator) => {
+  return 0;
+}
+
+function* getLineForDirection(direction, startingIndex, board) {
+  const coordinates = board.toCoordinates(startingIndex);
+  console.log('coord', coordinates);
+  while (board.areCoordinatesInBounds(coordinates)) {
+    yield coordinates;
+  }
+}
+
+const scoreForPossibleMove = (indexOfMove, board) => {
+  const directions = getDirections();
+  const lineScores = _(directions)
+    .map(direction => getLineForDirection(direction, indexOfMove, board))
+    .map(getLineScore);
+   return _(lineScores).max();
+}
+
 function getSmartMove(board, boardSize) {
+  const freeCells = getFreeCells(board);
+  const scores = freeCells.map(freeCell => {
+    return {
+      score: scoreForPossibleMove(freeCell, board),
+      move: freeCell
+    };
+  });
+  const bestMove = _(scores).maxBy('score');
+  /*
   const rayScoreAccumulator = (board, index, previousEvaluation) => {
     previousEvaluation = previousEvaluation || {ai: 0};
     const occupant = board[index];
@@ -47,21 +94,15 @@ function getSmartMove(board, boardSize) {
     rayScoreAccumulator,
     rayScoreSummer);
 
-  const bestMove = _(board)
-    // map to occupants
-    .map((val, index) => ({
-      occupant: val,
-      index: index
-    }))
-    // consider only unoccupied ones, i.e. cells with 0
-    .filter((val) => val.occupant === 0)
-    .map((val, index) => {
+  const bestMove = getFreeCells(board)
+    .map(index => {
       // get the score of rays casted from val.index
-      const result = sunrayCaster(board, boardSize, val.index);
-      return {index: val.index, score: result};
+      const result = sunrayCaster(board, boardSize, index);
+      return {index: index, score: result};
     }).maxBy('score');
     console.log('AI move', bestMove);
-  return bestMove.index;
+    */
+  return bestMove.move;
 }
 
 class Ai {
